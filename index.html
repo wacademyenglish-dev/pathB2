@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>WOLF LABS | The Roger Path (B2)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* === EXPLORATION LAB (GLASSMORPHISM PREMIUM THEME) === */
+        :root {
+            --bg-base: #020617;       
+            --bg-panel: rgba(15, 23, 42, 0.65); 
+            --bg-card: rgba(30, 41, 59, 0.45);  
+            --accent-primary: #22d3ee;   
+            --accent-secondary: #818cf8; 
+            --accent-alert: #f43f5e;     
+            --text-main: #f8fafc;        
+            --text-muted: #94a3b8;       
+            --border-soft: rgba(255, 255, 255, 0.08);
+            --glow-primary: rgba(34, 211, 238, 0.4);
+            --glow-secondary: rgba(129, 140, 248, 0.4);
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(34, 211, 238, 0.05), transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(129, 140, 248, 0.05), transparent 40%),
+                linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+        }
+
+        h1, h2, h3, .font-heading { font-family: 'Space Grotesk', sans-serif; }
+        .font-code { font-family: 'Fira Code', monospace; }
+
+        /* GLASSMORPHISM UTILITIES */
+        .glass-panel {
+            background: var(--bg-panel);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--border-soft);
+        }
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-soft);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            border-top: 1px solid rgba(255,255,255,0.15);
+            border-left: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* HUD TOP */
+        #hud-top {
+            position: fixed; top: 0; left: 0; right: 0; padding: 12px 30px;
+            z-index: 1000; 
+            border-bottom-width: 1px;
+            border-bottom-color: var(--border-soft);
+            box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+        }
+        .hud-bar-container { width: 140px; height: 5px; background: rgba(255,255,255,0.05); overflow: hidden; border-radius: 4px;}
+        .hud-bar-fill { height: 100%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 12px currentColor;}
+
+        /* CONTENT ARENA */
+        #mission-arena { height: 100vh; padding-bottom: 100px; padding-top: 80px; overflow-y: auto; scroll-behavior: smooth;}
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+
+        /* BUTTONS */
+        .btn-gradient {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: #000; border-radius: 12px;
+            font-family: 'Space Grotesk', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+            transition: all 0.3s ease; border: none; cursor: pointer;
+            box-shadow: 0 10px 25px var(--glow-primary);
+        }
+        .btn-gradient:hover { transform: translateY(-3px); box-shadow: 0 15px 35px var(--glow-secondary); filter: brightness(1.1);}
+        .btn-gradient:active { transform: scale(0.97); }
+
+        .btn-outline {
+            background: rgba(255,255,255,0.03); color: var(--accent-primary); border-radius: 12px;
+            font-family: 'Space Grotesk', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+            transition: all 0.3s ease; border: 1px solid var(--accent-primary); cursor: pointer;
+        }
+        .btn-outline:hover { background: rgba(34, 211, 238, 0.1); box-shadow: 0 0 20px var(--glow-primary); transform: translateY(-2px); }
+
+        /* VIDEO */
+        .video-wrapper { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 16px; overflow: hidden; border: 1px solid var(--border-soft); box-shadow: 0 20px 50px rgba(0,0,0,0.8); z-index: 50; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; pointer-events: auto !important; z-index: 60; }
+
+        /* KANBAN (Vocab Drag) */
+        .drag-word { padding: 12px 24px; background: rgba(129, 140, 248, 0.15); color: #c7d2fe; display: inline-flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 600; cursor: grab; transition: all 0.2s; border-radius: 8px; user-select: none; border: 1px solid rgba(129, 140, 248, 0.3); backdrop-filter: blur(8px);}
+        .drag-word:hover { transform: translateY(-4px) rotate(-1deg); background: rgba(129, 140, 248, 0.25); box-shadow: 0 10px 20px rgba(129, 140, 248, 0.2);}
+        .drag-word.dragging { opacity: 0.4; cursor: grabbing; transform: scale(1.05); }
+        .drop-zone { background: rgba(0,0,0,0.4); border: 2px dashed rgba(255,255,255,0.1); border-radius: 12px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; min-height: 180px; transition: all 0.3s; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);}
+        .drop-zone.drag-over { background: rgba(34, 211, 238, 0.05); border-color: var(--accent-primary); border-style: solid; box-shadow: inset 0 0 30px rgba(34, 211, 238, 0.15);}
+        .drop-area { min-height: 60px; background: rgba(0,0,0,0.3); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-top: 1rem; border: 1px solid transparent;}
+
+        /* TOGGLE TUNER */
+        .tuner-track { width: 72px; height: 36px; background: rgba(0,0,0,0.8); border-radius: 18px; position: relative; cursor: pointer; border: 1px solid var(--border-soft); transition: 0.3s; box-shadow: inset 0 2px 10px rgba(0,0,0,0.6);}
+        .tuner-knob { width: 26px; height: 26px; background: var(--text-muted); border-radius: 50%; position: absolute; top: 4px; left: 5px; transition: 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); box-shadow: 0 2px 5px rgba(0,0,0,0.5);}
+        .tuner-track.active { border-color: var(--accent-primary); background: rgba(34,211,238,0.15);}
+        .tuner-track.active .tuner-knob { transform: translateX(34px); background: var(--accent-primary); box-shadow: 0 0 15px var(--accent-primary);}
+
+        /* LOGIC GATE (Node Match) */
+        .logic-node { background: rgba(255,255,255,0.03); border: 1px solid var(--border-soft); color: var(--text-main); padding: 1.5rem; border-radius: 12px; font-weight: 400; font-size: 1.1rem; cursor: pointer; transition: all 0.2s; text-align: center; backdrop-filter: blur(8px);}
+        .logic-node:hover:not(.matched) { border-color: var(--accent-secondary); color: #c7d2fe; transform: translateY(-3px); background: rgba(129, 140, 248, 0.05); box-shadow: 0 10px 20px rgba(0,0,0,0.3);}
+        .logic-node.active { border-color: var(--accent-primary); background: rgba(34, 211, 238, 0.1); box-shadow: inset 0 0 20px rgba(34, 211, 238, 0.2); color: var(--accent-primary);}
+        .logic-node.matched { background: transparent; color: rgba(255,255,255,0.2); pointer-events: none; border-color: transparent; box-shadow: none;}
+
+        /* REDACTED TEXT / FADED INK */
+        .faded-word { background-color: rgba(34, 211, 238, 0.1); color: var(--accent-primary); cursor: pointer; transition: all 0.2s; padding: 4px 10px; border-radius: 6px; border: 1px dashed var(--accent-primary); font-family: 'Space Grotesk', sans-serif; font-weight: 600;}
+        .faded-word:hover { background-color: var(--accent-primary); color: #000; box-shadow: 0 0 15px var(--glow-primary);}
+        .faded-fixed { background-color: rgba(129, 140, 248, 0.15); color: #c7d2fe; pointer-events: none; border: 1px solid var(--accent-secondary); padding: 4px 10px; border-radius: 6px; font-family: 'Space Grotesk', sans-serif; font-weight: 600;}
+
+        /* GPT THERAPY SIMULATOR */
+        .chat-container { width: 100%; max-width: 850px; height: 450px; background: rgba(0,0,0,0.4); border: 1px solid var(--border-soft); border-radius: 20px; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 20px; box-shadow: inset 0 0 40px rgba(0,0,0,0.5); backdrop-filter: blur(12px);}
+        .chat-msg { max-width: 80%; padding: 18px 24px; border-radius: 16px; font-size: 1.1rem; line-height: 1.6; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; transform: scale(0.95) translateY(10px);}
+        .chat-msg.user { align-self: flex-end; background: var(--border-soft); color: #fff; border-bottom-right-radius: 4px; border: 1px solid rgba(255,255,255,0.05);}
+        .chat-msg.ai { align-self: flex-start; background: rgba(129, 140, 248, 0.1); border: 1px solid rgba(129, 140, 248, 0.3); color: #e0e7ff; border-bottom-left-radius: 4px; box-shadow: 0 4px 20px rgba(129,140,248,0.1);}
+        .typing-indicator { display: flex; gap: 5px; padding: 8px 4px; align-items: center; height: 28px;}
+        .typing-dot { width: 8px; height: 8px; background: var(--accent-secondary); border-radius: 50%; animation: typeBounce 1.4s infinite ease-in-out both; }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        /* POLAROIDS (Debate Flip) */
+        .polaroid-card { perspective: 1000px; cursor: pointer; }
+        .polaroid-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
+        .polaroid-card.flipped .polaroid-card-inner { transform: rotateY(180deg); }
+        .polaroid-front, .polaroid-back {
+            position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+            display: flex; flex-direction: column; padding: 2.5rem;
+            background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(16px); border-radius: 20px; border: 1px solid var(--border-soft);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+        .polaroid-front { align-items: center; justify-content: center; }
+        .polaroid-back { background: rgba(34, 211, 238, 0.05); transform: rotateY(180deg); align-items: center; justify-content: center; border-color: rgba(34, 211, 238, 0.3); }
+
+        /* NEW: DILEMMA CARDS */
+        .dilemma-container { display: flex; gap: 30px; width: 100%; justify-content: center; flex-wrap: wrap;}
+        .dilemma-card { flex: 1; min-width: 300px; padding: 50px 30px; border-radius: 24px; background: rgba(30, 41, 59, 0.4); border: 1px solid var(--border-soft); cursor: pointer; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); text-align: center; backdrop-filter: blur(16px);}
+        .dilemma-card:hover { border-color: var(--accent-primary); background: rgba(34, 211, 238, 0.05); transform: translateY(-5px); box-shadow: 0 15px 30px rgba(34, 211, 238, 0.15);}
+        .dilemma-card.selected { background: rgba(34, 211, 238, 0.15); border-color: var(--accent-primary); color: #fff; pointer-events: none; box-shadow: 0 10px 40px rgba(34, 211, 238, 0.3); transform: scale(1.02);}
+        .dilemma-card i { font-size: 4rem; margin-bottom: 25px; color: var(--text-muted); transition: 0.3s;}
+        .dilemma-card:hover i { color: var(--accent-primary); }
+        .dilemma-card.selected i { color: var(--accent-primary); text-shadow: 0 0 20px var(--glow-primary);}
+        .dilemma-container.locked .dilemma-card:not(.selected) { opacity: 0.3; filter: grayscale(100%); pointer-events: none; transform: scale(0.95); }
+
+        /* NEW: OPEN DEBATE */
+        .debate-btn { background: transparent; border: 1px solid var(--border-soft); color: var(--text-main); border-radius: 12px; padding: 15px 30px; font-family: 'Space Grotesk', sans-serif; font-weight: 600; letter-spacing: 0.05em; cursor: pointer; transition: 0.3s; flex: 1; text-align: center;}
+        .debate-btn:hover { background: rgba(255,255,255,0.05); transform: translateY(-2px); }
+        .debate-btn.selected.disagree { background: rgba(244,63,94,0.15); border-color: var(--accent-alert); color: var(--accent-alert); box-shadow: 0 0 20px rgba(244,63,94,0.2);}
+        .debate-btn.selected.neutral { background: rgba(255,255,255,0.1); border-color: #fff; color: #fff; box-shadow: 0 0 20px rgba(255,255,255,0.2);}
+        .debate-btn.selected.agree { background: rgba(34,211,238,0.15); border-color: var(--accent-primary); color: var(--accent-primary); box-shadow: 0 0 20px rgba(34,211,238,0.2);}
+        .debate-group.locked .debate-btn:not(.selected) { opacity: 0.3; pointer-events: none; }
+
+        /* UTILS */
+        .fade-in { animation: fadeIn 0.5s ease forwards; }
+        @keyframes typeBounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes popIn { to { transform: scale(1) translateY(0); opacity: 1; } }
+        @keyframes shake { 10%, 90% { transform: translate3d(-2px, 0, 0); } 20%, 80% { transform: translate3d(3px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-5px, 0, 0); } 40%, 60% { transform: translate3d(5px, 0, 0); } }
+
+        /* DRAWERS */
+        .drawer { background: var(--bg-panel); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border-left: 1px solid var(--border-soft); transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); z-index: 5100; box-shadow: -20px 0 50px rgba(0,0,0,0.8);}
+        .drawer.active { transform: translateX(0); }
+        
+        .starter-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; opacity: 0; margin-top: 0; }
+        .starter-content.open { max-height: 500px; opacity: 1; margin-top: 1.5rem; }
+    </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden text-base">
+
+    <!-- HUD SUPERIOR -->
+    <div id="hud-top" class="glass-panel hidden justify-between items-center w-full">
+        <div class="flex items-center gap-8">
+            <div class="flex flex-col gap-1.5">
+                <span class="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest font-heading">Insight (HP)</span>
+                <div class="hud-bar-container"><div id="hp-bar" class="hud-bar-fill bg-[var(--accent-primary)]" style="width: 100%; box-shadow: 0 0 10px var(--accent-primary);"></div></div>
+            </div>
+            <div class="flex flex-col gap-1.5">
+                <span class="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest font-heading">Integration (XP)</span>
+                <div class="hud-bar-container"><div id="xp-bar" class="hud-bar-fill bg-[var(--accent-secondary)]" style="width: 0%; box-shadow: 0 0 10px var(--accent-secondary);"></div></div>
+            </div>
+        </div>
+        <div class="text-right flex items-center gap-6">
+            <button onclick="toggleTeacherHUD()" class="px-5 py-2 bg-transparent border border-[var(--border-soft)] rounded-lg text-[11px] uppercase tracking-widest text-[var(--text-muted)] hover:bg-white/10 transition-all font-bold font-heading"><i class="fas fa-microscope mr-2"></i>Lab Director</button>
+            <div class="border-l border-[var(--border-soft)] pl-6">
+                <p class="font-heading text-xl font-bold text-white tracking-[0.1em] leading-none uppercase">WOLF LABS</p>
+                <p class="text-[10px] font-semibold text-[var(--accent-primary)] tracking-[0.2em] uppercase mt-1.5 font-code opacity-80">Lv. B2 / Exploration</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAINEL PRINCIPAL (CAPA) -->
+    <main id="dashboard" class="flex flex-col items-center relative px-8 pt-16 pb-48 z-10 w-full h-screen overflow-y-auto">
+        <button onclick="toggleFullscreen()" class="absolute top-8 right-10 text-[var(--text-muted)] hover:text-white text-2xl z-50 transition-colors" title="Fullscreen"><i class="fas fa-expand"></i></button>
+        <div class="max-w-5xl w-full flex flex-col items-center text-center space-y-8 animate-in fade-in my-auto pb-10">
+            
+            <div class="glass-card p-8 mb-2 mt-10 inline-block border-t-2 border-[var(--accent-secondary)] rounded-[2rem]">
+                <div class="w-28 h-28 bg-black/50 rounded-full flex items-center justify-center overflow-hidden text-[var(--accent-primary)] border border-[var(--border-soft)] shadow-[inset_0_0_30px_rgba(34,211,238,0.2)]">
+                    <i class="fas fa-compass text-5xl animate-pulse"></i>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <p class="text-[var(--accent-secondary)] font-semibold text-[12px] tracking-[0.3em] uppercase bg-black/30 border border-[var(--border-soft)] px-6 py-2.5 rounded-full inline-block font-heading backdrop-blur-md">Talent Analysis Protocol</p>
+                <h1 class="text-6xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-100 to-cyan-200 leading-tight tracking-tighter font-heading uppercase" style="filter: drop-shadow(0 10px 30px rgba(129, 140, 248, 0.4));">THE ROGER <br>PATH</h1>
+                <p class="text-xl text-[var(--text-muted)] font-light mt-8 max-w-3xl mx-auto leading-relaxed">Society tells us to specialize early, like Tiger Woods. But in a complex world, the best path might be sampling and exploring, like Roger Federer. Let's analyze the science of being a "Dabbler".</p>
+            </div>
+            
+            <div class="flex flex-wrap justify-center gap-4 mt-10 font-heading text-[11px] font-bold tracking-widest uppercase text-white/70">
+                <span class="px-5 py-2.5 bg-black/40 border border-[var(--border-soft)] rounded-full backdrop-blur-sm">Career & Innovation</span>
+                <span class="px-5 py-2.5 bg-[rgba(34,211,238,0.08)] border border-[rgba(34,211,238,0.3)] text-[var(--accent-primary)] rounded-full">Speculation Modals</span>
+                <span class="px-5 py-2.5 bg-[rgba(129,140,248,0.08)] border border-[rgba(129,140,248,0.3)] text-[var(--accent-secondary)] rounded-full">B2 Discussion</span>
+            </div>
+
+            <button onclick="startMission()" class="mt-14 btn-gradient px-16 py-5 text-lg rounded-full">
+                Enter The Lab <i class="fas fa-arrow-right ml-3"></i>
+            </button>
+        </div>
+    </main>
+
+    <!-- ARENA DE CONTEÚDO DA LIÇÃO -->
+    <main id="mission-arena" class="hidden flex-grow flex-col relative mt-[70px]">
+        <div id="mission-content" class="flex-grow overflow-y-auto px-4 py-8 flex flex-col items-center w-full"></div>
+    </main>
+
+    <!-- CONSOLA DE NAVEGAÇÃO -->
+    <footer id="nav-console" class="glass-panel hidden fixed bottom-0 left-0 w-full h-[80px] flex justify-between items-center px-10 z-[5000]">
+        <div class="flex items-center w-1/4">
+            <button onclick="goHome()" class="text-[var(--text-muted)] hover:text-[var(--accent-alert)] transition-colors p-3 rounded-full hover:bg-white/5" title="Exit Lab"><i class="fas fa-power-off text-2xl"></i></button>
+        </div>
+        <div class="flex items-center gap-12 justify-center w-1/2">
+            <button onclick="prevStep()" class="text-[var(--text-muted)] hover:text-white transition-colors p-2"><i class="fas fa-angle-left text-3xl"></i></button>
+            <div class="bg-black/60 px-8 py-2.5 rounded-full border border-[var(--border-soft)] shadow-inner">
+                <span id="console-counter" class="text-[12px] font-bold text-[var(--accent-primary)] tracking-[0.3em] uppercase font-heading">NODE 01/19</span>
+            </div>
+            <button onclick="nextStep()" class="text-[var(--text-muted)] hover:text-[var(--accent-primary)] transition-colors p-2"><i class="fas fa-angle-right text-3xl"></i></button>
+        </div>
+        <div class="flex items-center justify-end gap-6 w-1/4">
+            <button onclick="toggleWhiteboard()" class="text-[var(--text-muted)] hover:text-[var(--accent-secondary)] transition-colors p-3 rounded-full hover:bg-white/5" title="Hypothesis Pad"><i class="fas fa-pen-nib text-xl"></i></button>
+            <button onclick="toggleLessonNavigator()" class="text-[var(--text-muted)] hover:text-[var(--accent-primary)] transition-colors p-3 rounded-full hover:bg-white/5" title="Database"><i class="fas fa-layer-group text-xl"></i></button>
+        </div>
+    </footer>
+
+    <!-- DRAWERS -->
+    <aside id="whiteboard" class="fixed right-0 top-0 h-screen w-[420px] drawer flex flex-col pt-[70px]">
+        <div class="p-8 border-b border-[var(--border-soft)] flex justify-between items-center bg-black/20">
+            <h2 class="font-heading text-xl font-bold text-[var(--accent-secondary)] uppercase tracking-widest"><i class="fas fa-flask mr-3 opacity-70"></i> Hypothesis Pad</h2>
+            <button onclick="toggleWhiteboard()" class="text-[var(--text-muted)] hover:text-white w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition"><i class="fas fa-times text-xl"></i></button>
+        </div>
+        <div class="p-6 bg-black/40 flex flex-wrap gap-3 border-b border-[var(--border-soft)]">
+            <button onclick="insertTag('[MUST HAVE]')" class="text-[11px] bg-white/5 border border-[var(--border-soft)] text-white/80 px-4 py-2 rounded-lg hover:border-[var(--accent-primary)] hover:text-[var(--accent-primary)] transition-all font-heading font-bold uppercase tracking-wider">+ Must Have</button>
+            <button onclick="insertTag('[MIGHT HAVE]')" class="text-[11px] bg-white/5 border border-[var(--border-soft)] text-white/80 px-4 py-2 rounded-lg hover:border-[var(--accent-secondary)] hover:text-[var(--accent-secondary)] transition-all font-heading font-bold uppercase tracking-wider">+ Might Have</button>
+        </div>
+        <textarea id="wb-text" class="flex-grow bg-transparent text-[var(--accent-primary)] p-8 resize-none focus:outline-none font-code text-base leading-relaxed" placeholder="> Draft your theories here..."></textarea>
+    </aside>
+
+    <aside id="lesson-navigator" class="fixed right-0 top-0 h-screen w-[360px] drawer flex flex-col pt-[70px]">
+        <div class="p-8 border-b border-[var(--border-soft)] flex justify-between items-center bg-black/20">
+            <h2 class="font-heading text-xl font-bold text-white uppercase tracking-widest">Lab Index</h2>
+            <button onclick="toggleLessonNavigator()" class="text-[var(--text-muted)] hover:text-white w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition"><i class="fas fa-times text-xl"></i></button>
+        </div>
+        <div id="nav-steps-list" class="flex-grow overflow-y-auto p-6 space-y-3 bg-black/20"></div>
+    </aside>
+
+    <aside id="teacher-hud" class="fixed right-0 top-0 h-screen w-[400px] drawer flex flex-col pt-[70px]">
+        <div class="p-8 border-b border-[var(--border-soft)] flex justify-between items-center bg-black/20">
+            <h2 class="font-heading text-xl font-bold text-white uppercase tracking-widest"><i class="fas fa-microscope mr-3 opacity-70"></i> Director HUD</h2>
+            <button onclick="toggleTeacherHUD()"><i class="fas fa-times text-[var(--text-muted)] hover:text-white w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition text-xl"></i></button>
+        </div>
+        <div class="flex-grow overflow-y-auto p-8 space-y-8 bg-black/20">
+            <div class="bg-black/40 p-6 rounded-2xl border border-[var(--border-soft)] shadow-inner">
+                <p class="text-[11px] font-bold text-[var(--accent-primary)] uppercase tracking-widest mb-3 font-heading">Lesson Goal</p>
+                <p class="text-base text-[var(--text-main)] leading-relaxed font-ui font-light">Level B2. Discuss career paths, specialization vs exploration. Grammar: Modals of Deduction (Past/Present). Vocab: Dabbler, Plateau, Wicked environment.</p>
+            </div>
+            <div>
+                <p class="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-widest mb-4 font-heading">Deploy Praise</p>
+                <div class="space-y-4">
+                    <button onclick="triggerPraise('BRILLIANT DEDUCTION', 'Perfect Modal Usage.')" class="w-full py-4 bg-[rgba(34,211,238,0.05)] text-[var(--accent-primary)] border border-[var(--border-soft)] rounded-xl font-bold text-sm hover:bg-[var(--accent-primary)] hover:text-black transition-all uppercase tracking-widest font-heading shadow-md">SEND: CYAN</button>
+                    <button onclick="triggerPraise('INNOVATIVE THINKING', 'Excellent Generalization.')" class="w-full py-4 bg-[rgba(129,140,248,0.05)] text-[var(--accent-secondary)] border border-[var(--border-soft)] rounded-xl font-bold text-sm hover:bg-[var(--accent-secondary)] hover:text-white transition-all uppercase tracking-widest font-heading shadow-md">SEND: INDIGO</button>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Overlay de Elogio -->
+    <div id="praise-overlay" class="fixed inset-0 z-[6000] flex items-center justify-center bg-black/80 backdrop-blur-xl opacity-0 pointer-events-none transition-opacity duration-500 p-4">
+        <div id="praise-card" class="glass-card p-16 text-center transform scale-50 transition-transform duration-700 cubic-bezier(0.175, 0.885, 0.32, 1.275) border-t-4 border-[var(--accent-primary)] rounded-[3rem] max-w-2xl w-full">
+            <div class="w-28 h-28 mx-auto rounded-full bg-black/50 flex items-center justify-center border border-[var(--border-soft)] mb-8 shadow-[0_0_40px_rgba(34,211,238,0.3)]">
+                <i id="praise-icon" class="fas fa-lightbulb text-6xl text-[var(--accent-primary)]"></i>
+            </div>
+            <h2 id="praise-main" class="font-heading text-4xl md:text-5xl font-black tracking-tight uppercase mb-4 text-[var(--text-main)]"></h2>
+            <p id="praise-sub" class="text-base font-semibold text-[var(--accent-secondary)] tracking-[0.2em] uppercase font-heading"></p>
+        </div>
+    </div>
+
+    <!-- SCRIPT DO MOTOR PRINCIPAL -->
+    <script>
+        let state = { hp: 100, xp: 0, current: 0 };
+        const esc = (s) => s ? s.replace(/'/g, "\\'").replace(/"/g, "&quot;") : "";
+        
+        const TYPES = { COVER: "Intro", DILEMMA: "Choice", DEBATE: "Debate", STORY: "Lore", VIDEO: "Intel", VOCAB: "Hack", GRAMMAR: "Code", DRILL: "Wipe", MATCH: "Node", SPEAKING: "Voice", WRAP: "End", TUNER: "Patch" };
+        function step(type, title, html) { return { type, title, html }; }
+
+        function updateHUD() {
+            const h = document.getElementById('hp-bar'); if(h) h.style.width = Math.max(0, state.hp) + '%';
+            const x = document.getElementById('xp-bar'); if(x) x.style.width = Math.min(100, (state.xp / 100) * 100) + '%';
+        }
+        function insertTag(tag) { const text = document.getElementById('wb-text'); if (text) { text.value += (text.value.length > 0 ? '\n' : '') + tag + ' '; text.focus(); } }
+
+        function shuffleArray(array) {
+            let curId = array.length;
+            while (0 !== curId) { let randId = Math.floor(Math.random() * curId); curId -= 1; let tmp = array[curId]; array[curId] = array[randId]; array[randId] = tmp; }
+            return array;
+        }
+
+        // --- TEMPLATES (Premium Style) ---
+        const bGuide = (title, points) => step(TYPES.COVER, title, `
+            <div class="max-w-4xl mx-auto space-y-10 animate-in fade-in py-12">
+                <div class="glass-card border-t-2 border-[var(--accent-secondary)] rounded-3xl p-12">
+                    <p class="text-[var(--accent-secondary)] font-semibold uppercase tracking-[0.4em] text-[12px] mb-8 font-heading text-center">
+                        <i class="fas fa-file-contract text-xl mb-3 block opacity-80"></i> Laboratory Briefing
+                    </p>
+                    <h2 class="font-heading text-4xl md:text-5xl font-black text-white text-center mb-12 pb-10 border-b border-[var(--border-soft)] uppercase tracking-tight">${title}</h2>
+                    <div class="space-y-6 px-8">
+                        ${points.map(p => `<p class="text-xl text-[var(--text-main)] flex items-start gap-5 font-ui font-light leading-relaxed"><i class="fas fa-arrow-right text-[var(--accent-primary)] mt-1.5 opacity-80"></i> ${p}</p>`).join('')}
+                    </div>
+                </div>
+            </div>
+        `);
+
+        const bDilemmaCard = (id, title, instruction, opt1, opt2, followup, starter) => step(TYPES.DILEMMA, title, `
+            <div class="max-w-5xl mx-auto flex flex-col items-center py-12 animate-in fade-in">
+                <p class="text-[11px] font-bold text-[var(--accent-primary)] uppercase tracking-[0.3em] mb-6 bg-black/40 border border-[rgba(34,211,238,0.3)] px-6 py-2.5 rounded-full font-heading backdrop-blur-md shadow-lg"><i class="fas fa-code-branch mr-2"></i> Initial Variable</p>
+                <h2 class="font-heading text-4xl md:text-5xl font-black text-white tracking-tight uppercase mb-6 text-center">${title}</h2>
+                <p class="text-xl text-[var(--text-muted)] mb-12 text-center font-light">${instruction}</p>
+                
+                <div class="dilemma-container" id="dilemma-group-${id}">
+                    <div class="dilemma-card" onclick="selectDilemma(this, '${id}')">
+                        <i class="fas fa-crosshairs"></i>
+                        <p class="font-heading text-2xl font-bold text-white leading-snug">${opt1}</p>
+                    </div>
+                    <div class="dilemma-card" onclick="selectDilemma(this, '${id}')">
+                        <i class="fas fa-project-diagram"></i>
+                        <p class="font-heading text-2xl font-bold text-white leading-snug">${opt2}</p>
+                    </div>
+                </div>
+
+                <div class="hidden w-full max-w-4xl mt-14 glass-card border-l-4 border-[var(--accent-secondary)] p-10 rounded-2xl relative overflow-hidden" id="hub-dilemma-${id}">
+                    <p class="text-[11px] font-bold text-[var(--accent-secondary)] uppercase tracking-[0.3em] mb-5 font-heading"><i class="fas fa-comment-dots mr-2"></i> Director Query</p>
+                    <p class="text-2xl font-medium text-white leading-snug font-ui mb-6">"${followup}"</p>
+                    <div class="bg-black/50 p-6 rounded-xl border border-[var(--border-soft)]">
+                        <p class="text-xl font-light text-[var(--text-main)] font-ui italic">"${starter}"</p>
+                    </div>
+                </div>
+            </div>
+        `);
+
+        const bOpenDebate = (title, context, question, hints) => step(TYPES.DEBATE, title, `
+            <div class="max-w-4xl mx-auto flex flex-col items-center py-12 animate-in fade-in min-h-[60vh] justify-center">
+                <p class="text-[11px] font-bold text-[var(--accent-secondary)] uppercase tracking-[0.3em] mb-6 bg-black/40 border border-[rgba(129,140,248,0.3)] px-6 py-2.5 rounded-full font-heading backdrop-blur-md shadow-lg"><i class="fas fa-comments mr-2"></i> Discussion Node</p>
+                <h2 class="font-heading text-4xl md:text-5xl font-black text-white tracking-tight uppercase mb-10 text-center">${title}</h2>
+                
+                <div class="w-full glass-card p-12 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden mb-8">
+                    <p class="text-lg text-[var(--text-muted)] font-ui font-light text-center mb-8 italic">"${context}"</p>
+                    <p class="text-3xl text-white leading-relaxed font-heading font-bold text-center">${question}</p>
+                </div>
+
+                <div class="w-full text-left">
+                    <div class="flex justify-between items-center cursor-pointer p-6 bg-black/30 border border-[var(--border-soft)] rounded-2xl hover:bg-black/50 transition-colors" onclick="toggleStarter(this)">
+                        <div class="flex items-center gap-5">
+                            <i class="fas fa-lightbulb text-[var(--accent-primary)] text-2xl opacity-80"></i>
+                            <span class="font-bold text-[var(--text-muted)] tracking-widest uppercase text-sm font-heading">Reveal Analyst Tips</span>
+                        </div>
+                        <i class="fas fa-chevron-down text-slate-500"></i>
+                    </div>
+                    <div class="starter-content px-6 pb-6">
+                        <div class="bg-black/50 p-8 rounded-xl border border-[var(--border-soft)] mt-4">
+                            <ul class="list-disc pl-5 space-y-3">
+                                ${hints.map(h => `<li class="text-lg font-light text-[var(--text-main)] font-ui">${h}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `);
+
+        const bStandYourGround = (id, title, statement) => step(TYPES.DEBATE, title, `
+            <div class="max-w-5xl mx-auto flex flex-col items-center py-12 animate-in fade-in">
+                <p class="text-[11px] font-bold text-[var(--accent-primary)] uppercase tracking-[0.3em] mb-6 bg-black/40 px-6 py-2.5 rounded-full font-heading border border-[rgba(34,211,238,0.3)] shadow-lg"><i class="fas fa-balance-scale mr-2"></i> Ethics Protocol</p>
+                <h2 class="font-heading text-4xl md:text-5xl font-black text-white tracking-tight uppercase mb-6 text-center">${title}</h2>
+                <p class="text-[var(--text-muted)] text-xl mb-12 text-center font-light">Defend your position regarding this hypothesis.</p>
+                
+                <div class="w-full">
+                    <div class="glass-card p-12 rounded-3xl font-heading text-3xl font-bold mb-10 text-center text-white border-t-2 border-[var(--accent-primary)]">
+                        "${statement}"
+                    </div>
+                    <div class="flex gap-6 justify-center w-full debate-group" id="debate-group-${id}">
+                        <button class="debate-btn disagree" onclick="selectDebate(this, '${id}')">DISAGREE</button>
+                        <button class="debate-btn neutral" onclick="selectDebate(this, '${id}')">NEUTRAL</button>
+                        <button class="debate-btn agree" onclick="selectDebate(this, '${id}')">AGREE</button>
+                    </div>
+                </div>
+
+                <div class="hidden w-full max-w-4xl mt-14 glass-card border-l-4 border-[var(--accent-secondary)] p-10 rounded-2xl relative overflow-hidden" id="hub-debate-${id}">
+                    <p class="text-[11px] font-bold text-[var(--accent-secondary)] uppercase tracking-[0.3em] mb-5 font-heading"><i class="fas fa-comment-dots mr-2"></i> Director Query</p>
+                    <p class="text-2xl font-medium text-white leading-snug font-ui mb-6">"Why did you choose that stance? Justify your answer."</p>
+                    <div class="bg-black/50 p-6 rounded-xl border border-[var(--border-soft)]">
+                        <p class="text-xl font-light text-[var(--text-main)] font-ui italic">"I chose this because..."</p>
+                    </div>
+                </div>
+            </div>
+        `);
+
+        const bVideo = (title, desc, ytUrl) => step(TYPES.VIDEO, title, `
+            <div class="max-w-5xl mx-auto flex flex-col items-center justify-center min-h-[60vh] py-12 animate-in fade-in">
+                <p class="text-[11px] font-bold text-[var(--text-main)] uppercase tracking-[0.4em] mb-6 bg-white/10 border border-[var(--border-soft)] px-6 py-2.5 rounded-full font-heading backdrop-blur-md shadow-lg"><i class="fas fa-play-circle mr-2"></i> Case Study</p>
+                <h2 class="font-heading text-4xl md:text-5xl font-black text-white tracking-tight uppercase mb-6 text-center">${title}</h2>
+                <p class="text-xl text-[var(--text-muted)] mb-10 text-center font-light max-w-3xl leading-relaxed">${desc}</p>
+                
+                <div class="video-wrapper">
+                    <iframe src="${ytUrl}" allowfullscreen></iframe>
+                </div>
+            </div>
+        `);
+
+        const bStoryCard = (title, chapter, text, question) => step(TYPES.STORY, title, `
+            <div class="max-w-4xl mx-auto flex flex-col items-center py-12 animate-in fade-in min-h-[60vh] justify-center">
+                <p class="text-[11px] font-bold text-[var(--accent-primary)] uppercase tracking-[0.3em] mb-6 bg-black/40 px-6 py-2.5 rounded-full border border-[rgba(34,211,238,0.3)] font-heading shadow-lg"><i class="fas fa-file-alt mr-2"></i> Concept ${chapter}</p>
+                <h2 class="font-heading text-4xl md:text-5xl font-black text-white tracking-tight uppercase mb-10 text-center">${title}</h2>
+                <div class="w-full glass-card p-14 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)]"></div>
+                    <i class="fas fa-quote-left absolute top-10 left-10 text-5xl text-[var(--accent-primary)] opacity-10"></i>
+                    <p class="text-2xl text-[var(--text-main)] leading-relaxed font-ui font-light relative z-10 text-center mb-10 px-8">${text}</p>
+                    <div class="border-t border-[var(--border-soft)] pt-8 mt-4">
+                        <p class="text-center text-[var(--accent-secondary)] font-bold uppercase tracking-[0.2em] font-heading text-sm">${question}</p>
+                    </div>
+                </div>
+                <div class="mt-12 text-[var(--text-muted)] text-xs uppercase tracking-widest font-heading animate-pulse opacity-60">Initializing Next Node...</div>
+            </div>
+        `);
+
+        const bGrammar = (title, rule, examples, tagColor="var(--accent-primary)") => step(TYPES.GRAMMAR, title, `
+            <div class="max-w-4xl mx-auto space-y-12 animate-in fade-in py-12">
+                <div class="text-center space-y-6 mb-16">
+                    <p class="text-[11px] font-bold text-[var(--bg-base)] uppercase tracking-[0.4em] inline-block px-6 py-2.5 rounded-full font-heading shadow-sm" style="background-color: ${tagColor}">Framework</p>
+                    <h2 class="font-heading text-5xl md:text-6xl font-black text-white tracking-tight uppercase">${title}</h2>
+                </div>
+                <div class="glass-card border-t-4 p-14 text-center rounded-[2.5rem]" style="border-top-color: ${tagColor}">
+                    <p class="text-[1.35rem] text-[var(--text-main)] font-light leading-loose font-ui">${rule.replace(/\[(.*?)\]/g, `<span style="color: ${tagColor}" class="font-bold bg-black/40 px-4 py-2 rounded-xl border border-white/10 font-heading text-[1.2rem] mx-1">$1</span>`)}</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
+                    ${examples.map(ex => `
+                        <div class="glass-panel p-10 rounded-[2rem] text-center relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-b from-[rgba(255,255,255,0.03)] to-transparent"></div>
+                            <p class="text-[11px] font-semibold uppercase text-[var(--text-muted)] tracking-[0.3em] mb-6 font-heading relative z-10">${ex.context}</p>
+                            <p class="text-2xl font-medium text-white font-ui leading-relaxed relative z-10">"${ex.text.replace(/\[(.*?)\]/g, `<span style="color: ${tagColor}; font-weight: 700;">$1</span>`)}"</p>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `);
+
+        const bTuner = (id, title, instruction, textAff, textAlt, feedback, tagColor="var(--accent-primary)") => step(TYPES.TUNER, title, `
+            <div class="max-w-4xl mx-auto flex flex-col items-center justify-center min-h-[60vh] text-center space-y-12 animate-in fade-in py-12">
+                <p class="text-[11px] font-bold text-[var(--bg-base)] uppercase tracking-[0.4em] inline-block px-6 py-2.5 rounded-full font-heading shadow-md" style="background-color: ${tagColor}">Hypothesis Testing</p>
+                <h2 class="text-4xl md:text-5xl font-black text-white tracking-tight uppercase font-heading">${title}</h2>
+                <p class="text-xl text-[var(--text-muted)] max-w-2xl font-light">${instruction}</p>
+                
+                <div class="w-full max-w-3xl glass-card flex flex-col items-center py-16 rounded-[2.5rem]">
+                    <div class="flex items-center gap-8 mb-14">
+                        <span class="font-heading font-semibold text-[var(--text-muted)] text-sm w-32 text-right uppercase tracking-widest opacity-60 transition-opacity" id="mode-aff-${id}">Incorrect</span>
+                        <div class="tuner-track" id="tuner-track-${id}" onclick="toggleTuner('${id}', '${esc(textAff)}', '${esc(textAlt)}', '${esc(feedback)}', '${tagColor}')">
+                            <div class="tuner-knob"></div>
+                        </div>
+                        <span class="font-heading font-semibold text-[var(--text-main)] text-sm w-32 text-left uppercase tracking-widest transition-opacity" id="mode-alt-${id}">Correct</span>
+                    </div>
+
+                    <div class="bg-black/30 w-full max-w-2xl p-12 rounded-3xl border border-[var(--border-soft)] flex items-center justify-center min-h-[160px] shadow-inner backdrop-blur-sm">
+                        <p id="tuner-text-${id}" class="text-3xl font-ui font-medium tracking-wide transition-opacity duration-300 text-[var(--accent-alert)] leading-relaxed">${textAff.replace(/\[(.*?)\]/g, `<span class="border-b-2 border-[var(--accent-alert)]/50 pb-1">$1</span>`)}</p>
+                    </div>
+                    
+                    <div id="tuner-fb-${id}" class="hidden mt-10 text-sm font-bold text-[var(--accent-primary)] font-heading uppercase tracking-[0.3em]">
+                        <i class="fas fa-check-circle mr-2"></i> ${feedback}
+                    </div>
+                </div>
+            </div>
+        `);
+
+        const bVocabDrag = (id, title, instruction, items, followup) => {
+            let words = shuffleArray([...items]).map(w => `
+                <div class="drag-word" draggable="true" ondragstart="dragVocab(event, this)" ondragend="this.classList.remove('dragging')" data-word="${esc(w.word)}">
+                    <i class="fas fa-tag mr-3 opacity-40"></i>${w.word}
+                </div>
+            `).join('');
+
+            let dropzones = items.map((w, i) => `
+                <div class="drop-zone glass-panel" data-expected="${esc(w.word)}" ondrop="dropVocab(event, this)" ondragover="allowDropVocab(event)" ondragleave="leaveDropVocab(event)">
+                    <p class="text-[var(--text-main)] font-light text-xl leading-relaxed font-ui text-center px-4">"${w.def}"</p>
+                    <div class="drop-area">
+                        <span class="text-xs font-heading text-[var(--text-muted)] uppercase tracking-[0.2em] pointer-events-none">Drop Concept</span>
+                    </div>
+                </div>
+            `).join('');
+
+            return step(TYPES.VOCAB, title, `
+                <div class="max-w-5xl mx-auto w-full flex flex-col items-center py-12 animate-in fade-in" id="vocab-container-${id}">
+                    <p class="text-[11px] font-bold text-[var(--accent-secondary)] uppercase tracking-[0.4em] mb-6 bg-black/40 px-6 py-2.5 rounded-full border border-[rgba(129,140,248,0.3)] font-heading shadow-sm"><i class="fas fa-database mr-2"></i> Terminology</p>
+                    <h2 class="font-heading text-4xl md:text-5xl font-black text-white tracking-tight mb-6 text-center uppercase">${title}</h2>
+                    <p class="text-[var(--text-muted)] text-xl mb-12 text-center max-w-3xl font-light">${instruction}</p>
+                    
+                    <div class="w-full max-w-4xl mb-12 p-10 glass-card rounded-[2rem]">
+                        <p class="text-[11px] font-bold text-[var(--text-muted)] uppercase tracking-[0.3em] mb-8 font-heading text-center">Unassigned Data</p>
+                        <div class="vocab-bank flex flex-wrap gap-5 min-h-[60px] items-center justify-center">
+                            ${words}
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
+                        ${dropzones}
+                    </div>
+
+                    <div class="vocab-followup hidden w-full max-w-4xl mt-14 bg-black/50 border-l-4 border-[var(--accent-primary)] p-10 rounded-2xl shadow-2xl backdrop-blur-md relative overflow-hidden">
+                        <p class="text-[11px] font-bold text-[var(--accent-primary)] uppercase tracking-[0.3em] mb-5 font-heading"><i class="fas fa-comment-dots mr-2"></i> Director Query</p>
+                        <p class="text-2xl font-medium text-white leading-snug font-ui">"${followup}"</p>
+                    </div>
+                </div>
+            `);
+        };
+
+        const bLogicGate = (id, title, instruction, pairs) => {
+            let lefts = pairs.map((p, i) => ({text: p.left, id: i, type: 'L'}));
+            let rights = pairs.map((p, i) => ({text: p.right, id: i, type: 'R'}));
+            lefts = shuffleArray(lefts); rights = shuffleArray(rights);
+
+            const buildNodes = (arr) => arr.map(item => `
+                <div class="logic-node" data-id="${item.id}" data-type="${item.type}" onclick="handleMatch(this)">${item.text}</div>
+            `).join('');
+
+            return step(TYPES.MATCH, title, `
+                <div class="max-w-5xl mx-auto w-full flex flex-col items-center py-12 animate-in fade-in">
+                    <p class="text-[11px] font-bold text-[var(--accent-primary)] uppercase tracking-[0.3em] mb-6 bg-black/40 px-6 py-2.5 rounded-full font-heading border border-[rgba(34,211,238,0.3)]"><i class="fas fa-project-diagram mr-2"></i> Connections</p>
+                    <h2 class="font-heading text-4xl md:text-5xl font-black text-white tracking-tight uppercase mb-6 text-center">${title}</h2>
+                    <p class="text-[var(--text-muted)] text-xl mb-14 text-center font-light">${instruction}</p>
+                    
+                    <div class="w-full max-w-4xl glass-card p-14 rounded-[2.5rem] relative" id="match-board">
+                        <div class="grid grid-cols-2 gap-x-20 gap-y-8 w-full relative z-10">
+                            <div class="flex flex-col gap-6" id="match-left">${buildNodes(lefts)}</div>
+                            <div class="flex flex-col gap-6" id="match-right">${buildNodes(rights)}</div>
+                        </div>
+                    </div>
+                    <div id="match-hub" class="hidden mt-12 text-[var(--accent-secondary)] text-sm font-bold font-heading uppercase tracking-[0.3em] bg-black/40 px-8 py-4 rounded-full border border-[rgba(129,140,248,0.3)]"><i class="fas fa-check-circle mr-2"></i> Logic Synced.</div>
+                </div>
+            `);
+        }
+
+        const bRedactedNotes = (id, title, instruction, text, expectedFixes) => {
+            let expectedFixesCopy = [...expectedFixes]; 
+            let htmlText = text.replace(/\[(.*?)\]/g, (match, word) => {
+                const fixData = expectedFixesCopy.shift();
+                return `<span class="faded-word" onclick="triggerFixer(this, '${esc(fixData)}')">${word}</span>`;
+            });
+
+            return step(TYPES.DRILL, title, `
+                <div class="max-w-4xl mx-auto w-full flex flex-col items-center py-12 animate-in fade-in">
+                    <p class="text-[11px] font-bold text-[var(--accent-secondary)] uppercase tracking-[0.3em] mb-6 font-heading bg-black/40 px-6 py-2.5 rounded-full border border-[rgba(129,140,248,0.3)]"><i class="fas fa-pencil-ruler mr-2"></i> Data Restoration</p>
+                    <h2 class="text-4xl md:text-5xl font-black text-white tracking-tight uppercase mb-6 text-center font-heading">${title}</h2>
+                    <p class="text-[var(--text-muted)] text-xl mb-12 text-center font-light">${instruction}</p>
+                    
+                    <div class="w-full glass-card p-16 rounded-[2.5rem] relative overflow-hidden text-[1.4rem] leading-loose text-white font-ui font-light min-h-[250px] text-center">
+                        ${htmlText}
+                        <div id="fix-panel" class="absolute bottom-0 left-0 w-full bg-black/95 backdrop-blur-xl border-t border-[var(--accent-secondary)] p-10 transform translate-y-full transition-transform duration-500 cubic-bezier(0.175, 0.885, 0.32, 1.275) flex items-center gap-6 z-20">
+                            <span class="text-[var(--accent-secondary)] text-sm uppercase tracking-[0.2em] font-bold font-heading whitespace-nowrap">Inject Missing Data:</span>
+                            <input type="text" id="fix-input" class="bg-black/50 text-white border border-[var(--border-soft)] rounded-xl px-6 py-4 flex-1 text-xl focus:outline-none focus:border-[var(--accent-secondary)] font-code" autocomplete="off">
+                            <button onclick="submitFixer()" class="px-10 py-4 text-base font-bold font-heading rounded-xl uppercase tracking-widest transition-all hover:scale-95" style="background: rgba(129,140,248,0.1); border: 1px solid var(--accent-secondary); color: var(--accent-secondary);">Patch</button>
+                        </div>
+                    </div>
+                    <div id="fixer-hub" class="hidden mt-12 text-[var(--accent-primary)] text-sm font-heading font-bold uppercase tracking-[0.3em] bg-black/40 px-8 py-4 border border-[rgba(34,211,238,0.3)] rounded-full"><i class="fas fa-check mr-2"></i> Profile Restored.</div>
+                </div>
+            `);
+        }
+
+        const bGPTSimulator = (id, title, instruction) => step(TYPES.CUSTOM, title, `
+            <div class="max-w-4xl mx-auto flex flex-col items-center py-12 animate-in fade-in">
+                <p class="text-[11px] font-bold text-[var(--accent-primary)] uppercase tracking-[0.3em] mb-6 bg-black/40 px-6 py-2.5 rounded-full border border-[rgba(34,211,238,0.3)] font-heading"><i class="fas fa-microchip mr-2"></i> AI Interface</p>
+                <h2 class="font-heading text-4xl md:text-5xl font-black text-white tracking-tight uppercase mb-6 text-center">${title}</h2>
+                <p class="text-[var(--text-muted)] text-xl mb-12 text-center font-light">${instruction}</p>
+                
+                <div class="chat-container" id="ai-chat-box-${id}">
+                    <div class="chat-msg ai">ANALYSIS COMPLETE. The 10,000 hours rule is the only logical path to greatness. Specialization must begin at birth. Do you disagree?</div>
+                </div>
+
+                <button class="btn-gradient px-14 py-5 mt-10 rounded-full text-lg shadow-[0_0_30px_rgba(34,211,238,0.2)]" id="prompt-btn-${id}" onclick="promptAI('${id}')">REPLY: "Generalists integrate better!"</button>
+
+                <div class="hidden w-full max-w-3xl mt-14 bg-black/50 border-l-4 border-[var(--accent-secondary)] p-10 rounded-2xl shadow-2xl backdrop-blur-md" id="ai-followup-${id}">
+                    <p class="text-[11px] font-bold text-[var(--accent-secondary)] uppercase tracking-[0.3em] mb-5 font-heading"><i class="fas fa-comment-dots mr-2"></i> System Challenge</p>
+                    <p class="text-2xl font-medium text-white leading-snug font-ui mb-6">"The AI struggles to understand the value of 'dabbling'. How would you explain it using a modal of deduction?"</p>
+                    <div class="bg-black/60 p-6 rounded-xl border border-[var(--border-soft)]">
+                        <p class="text-xl font-light text-[var(--text-main)] font-ui italic">"A generalist <span class="font-bold text-[var(--accent-secondary)]">might be</span> better because..."</p>
+                    </div>
+                </div>
+            </div>
+        `);
+
+        const bDebateFlip = (title, instruction, cards) => step(TYPES.SPEAKING, title, `
+            <div class="max-w-4xl mx-auto flex flex-col items-center py-12 animate-in fade-in">
+                <p class="text-[11px] font-bold text-[var(--text-main)] uppercase tracking-[0.3em] mb-6 font-heading bg-white/10 px-6 py-2.5 border border-[var(--border-soft)] rounded-full backdrop-blur-md"><i class="fas fa-balance-scale mr-2"></i> Debate Cards</p>
+                <h2 class="font-heading text-4xl md:text-5xl font-black text-white tracking-tight uppercase mb-6 text-center">${title}</h2>
+                <p class="text-[var(--text-muted)] text-xl mb-14 text-center font-light">${instruction}</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10 w-full max-w-4xl">
+                    ${cards.map((card, idx) => `
+                        <div class="polaroid-card w-full h-[280px]" onclick="this.classList.toggle('flipped')">
+                            <div class="polaroid-card-inner">
+                                <div class="polaroid-front">
+                                    <i class="fas fa-frog text-7xl text-[var(--text-muted)] mb-8 opacity-20"></i>
+                                    <p class="font-heading text-white font-bold tracking-widest uppercase text-2xl">Dilemma ${idx + 1}</p>
+                                    <p class="text-xs text-[var(--accent-secondary)] mt-6 font-heading font-bold tracking-[0.2em]">CLICK TO FLIP</p>
+                                </div>
+                                <div class="polaroid-back">
+                                    <p class="text-2xl font-ui font-light text-white leading-relaxed p-6">"${card}"</p>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `);
+
+        const bWrap = () => step(TYPES.WRAP, "Mission Complete", `
+            <div class="text-center max-w-3xl mx-auto flex flex-col items-center justify-center min-h-[70vh] animate-in fade-in">
+                <div class="w-40 h-40 rounded-full bg-black/50 mx-auto flex items-center justify-center text-7xl text-[var(--accent-primary)] mb-12 shadow-[0_0_80px_rgba(34,211,238,0.2)] border border-[var(--border-cyan)] backdrop-blur-md">
+                    <i class="fas fa-compass"></i>
+                </div>
+                <h1 class="font-heading text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-indigo-300 tracking-tighter mb-8 uppercase" style="filter: drop-shadow(0 0 30px rgba(34,211,238,0.3));">PATH DISCOVERED</h1>
+                <p class="text-2xl text-[var(--text-muted)] mb-14 font-ui leading-relaxed max-w-2xl mx-auto font-light">You have successfully analyzed the science of exploration. Your mastery of Modals of Deduction is verified.</p>
+                <button onclick="goHome()" class="btn-outline px-16 py-5 text-base rounded-full border-2">Exit Lab</button>
+            </div>
+        `);
+
+        // --- LESSON DATA (THE ROGER PATH - B2) ---
+        // Exactly 19 Pages
+        const lessonData = [
+            /* 1 */ bGuide("The Roger Path", [
+                "Role: Talent Analyst / Strategist.", 
+                "Target: Understand specialization vs generalization in a complex world.",
+                "Grammar Focus: Modals of Deduction (Past & Present).",
+                "Mission: Deconstruct the 10,000-hour rule using science and logic."
+            ]),
+
+            /* 2 */ bDilemmaCard("warmup1", "Career Dilemma", "If you had to choose a path for your child's future, which one would you pick?", 
+                "Master 1 skill completely by age 18", 
+                "Try 10 different skills but master none", 
+                "Why did you choose that path?", 
+                "I chose this because..."
+            ),
+
+            /* 3 */ bStoryCard("The Tiger Path", "01", "Tiger Woods' father gave him a putter at 7 months old. By age 21, he was the greatest golfer in the world. It’s the perfect story. It makes us think that to be great, we must start early and focus only on one thing. But does this rule apply to everything?", "WHY DO WE LOVE THE TIGER WOODS STORY?"),
+
+            /* 4 */ bGrammar("Deduction (Past)", "Use [Modal + have + past participle] to make deductions about the past based on evidence.<br><br>[Must have] = almost 100% sure it happened.<br>[Might/Could have] = maybe it happened.<br>[Can't/Couldn't have] = almost 100% sure it didn't happen.", [
+                {context: "Near Certainty", text: "Tiger Woods [must have practiced] every single day."},
+                {context: "Impossibility", text: "He [can't have had] a normal childhood."}
+            ], "var(--accent-secondary)"),
+
+            /* 5 */ bTuner("tun1", "Modal Calibration", "Fix the deduction regarding Tiger's father.", "He [must wanted] his son to be a champion.", "He [must have wanted] his son to be a champion.", "Syntax Patched: Past deduction requires 'have + V3'.", "var(--accent-secondary)"),
+
+            /* 6 */ bOpenDebate("The Tiger Illusion", "Some parents force toddlers to practice a sport or instrument for 5 hours a day.", "Is early specialization a form of child abuse, or just good parenting?", [
+                "Use Modals: They might have good intentions...",
+                "Use Vocab: Precocious, Pressure, Deliberate Practice",
+                "Consider the psychological impact on the child."
+            ]),
+
+            /* 7 */ bVideo("The Data on Elites", "Watch from 0:00 to 1:15. What do scientists actually see when they study elite athletes?", "https://www.youtube-nocookie.com/embed/jLOuMXnM5wk?start=0&end=75&rel=0&modestbranding=1"),
+
+            /* 8 */ bVocabDrag("vm1", "Lab Terminology", "Drag the concepts from the video to their definitions.", [
+                {word: "Deliberate Practice", def: "Focused, highly structured training designed specifically to improve performance."},
+                {word: "Sampling Period", def: "A time of trying a variety of activities before specializing."},
+                {word: "Plateau", def: "To stop improving and stay at the same level."},
+                {word: "Precocious", def: "Showing advanced skills or abilities at a very young age."}
+            ], "Did you have a 'sampling period' as a child? What did you try?"),
+
+            /* 9 */ bStoryCard("The Roger Path", "02", "Roger Federer played tennis, skiing, wrestling, soccer, and skateboarding. He was a 'dabbler'. He delayed specialization. Yet, he became just as famous as Tiger Woods. Why don't we hear his story as often?", "WHY IS THE ROGER FEDERER STORY LESS POPULAR?"),
+
+            /* 10 */ bLogicGate("lg1", "Athlete Profiles", "Match the athlete/concept to the reality.", [
+                {left: "Tiger Woods...", right: "...represents obligatory early specialization."},
+                {left: "Future elites...", right: "...tend to have a long sampling period."},
+                {left: "Peers who specialize early...", right: "...often plateau at lower levels."}
+            ]),
+
+            /* 11 */ bStandYourGround("syg1", "Leadership Styles", "Generalists are always better leaders than specialists."),
+
+            /* 12 */ bVideo("Kind vs. Wicked Worlds", "Watch from 2:50 to 3:45. What is the difference between Golf and the real world?", "https://www.youtube-nocookie.com/embed/jLOuMXnM5wk?start=170&end=225&rel=0&modestbranding=1"),
+
+            /* 13 */ bGrammar("Deduction (Present)", "Use [Modal + Base Verb] to make deductions about the present.<br><br>[Must be] = 100% sure it is.<br>[Might/Could be] = maybe it is.<br>[Can't be] = 100% sure it isn't.", [
+                {context: "Present Certainty", text: "Golf [must be] a 'kind' environment."},
+                {context: "Present Impossibility", text: "Life [can't be] completely predictable."}
+            ], "var(--accent-primary)"),
+
+            /* 14 */ bRedactedNotes("fix1", "Environment Analysis", "Fill in the correct present modals: [must be], [might be], [can't be].", 
+                "In a wicked world, the rules change constantly. It [can't be] easy to predict the future. Therefore, adapting [must be] the most important skill.", 
+                ["can't be", "must be"]
+            ),
+
+            /* 15 */ bStoryCard("The Nintendo Hacker", "03", "Gunpei Yokoi didn't score well in electronics. He got a low-tier job at a playing card company. But he combined old calculator tech with credit card tech. He created the Game Boy. He wasn't a specialist; he merged domains.", "HOW DID BEING A 'DABBLER' HELP YOKOI?"),
+
+            /* 16 */ bVideo("Frogs and Birds", "Watch from 4:50 to the end. Who do we need more in a healthy ecosystem?", "https://www.youtube-nocookie.com/embed/jLOuMXnM5wk?start=290&end=346&rel=0&modestbranding=1"),
+
+            /* 17 */ bDebateFlip("Philosophical Dilemmas", "Discuss the Frog vs Bird concept with your Lab Director.", [
+                "Are you currently acting more like a Frog (specialist) or a Bird (generalist) in your career?",
+                "Why is our education system designed only to create Frogs?"
+            ]),
+
+            /* 18 */ bGPTSimulator("gpt1", "AI Bias Analysis", "The system prefers specialists. Challenge its logic."),
+
+            /* 19 */ bWrap()
+        ];
+
+        // --- RUNTIME LOGIC ---
+        function toggleElementClass(id, action, className) {
+            const el = document.getElementById(id);
+            if (el) { if (action === 'add') el.classList.add(className); else if (action === 'remove') el.classList.remove(className); }
+        }
+
+        function startMission() {
+            toggleElementClass('dashboard', 'add', 'hidden'); toggleElementClass('dashboard', 'remove', 'flex');
+            toggleElementClass('hud-top', 'remove', 'hidden'); toggleElementClass('hud-top', 'add', 'flex');
+            toggleElementClass('mission-arena', 'remove', 'hidden'); toggleElementClass('mission-arena', 'add', 'flex');
+            toggleElementClass('nav-console', 'remove', 'hidden'); toggleElementClass('nav-console', 'add', 'flex');
+            buildLessonNavigator(); renderStep();
+        }
+
+        function goHome() {
+            toggleElementClass('dashboard', 'remove', 'hidden'); toggleElementClass('dashboard', 'add', 'flex');
+            toggleElementClass('hud-top', 'add', 'hidden'); toggleElementClass('hud-top', 'remove', 'flex');
+            toggleElementClass('mission-arena', 'add', 'hidden'); toggleElementClass('mission-arena', 'remove', 'flex');
+            toggleElementClass('nav-console', 'add', 'hidden'); toggleElementClass('nav-console', 'remove', 'flex');
+            state.current = 0; state.hp = 100; state.xp = 0; updateHUD();
+            document.getElementById('lesson-navigator')?.classList.remove('active');
+            document.getElementById('teacher-hud')?.classList.remove('active');
+            document.getElementById('whiteboard')?.classList.remove('active');
+        }
+
+        function buildLessonNavigator() {
+            const navList = document.getElementById('nav-steps-list');
+            if(!navList) return;
+            navList.innerHTML = '';
+            lessonData.forEach((step, i) => {
+                const btn = document.createElement('div');
+                btn.className = `w-full text-left p-4 rounded-xl flex items-center gap-4 transition-all font-ui text-sm cursor-pointer mb-2 border ${i === state.current ? 'bg-[rgba(34,211,238,0.08)] text-[var(--accent-primary)] border-[var(--accent-primary)] font-semibold shadow-[0_0_15px_rgba(34,211,238,0.1)]' : 'bg-black/30 text-[var(--text-muted)] border-transparent hover:bg-white/5'}`;
+                btn.innerHTML = `<span class="opacity-50 font-code text-xs w-6">${String(i+1).padStart(2,'0')}</span><span class="truncate">${step.title}</span>`;
+                btn.onclick = () => { state.current = i; renderStep(); toggleLessonNavigator(); };
+                navList.appendChild(btn);
+            });
+        }
+
+        function renderStep() {
+            if (!lessonData || !lessonData[state.current]) return;
+            const step = lessonData[state.current];
+            const sCount = document.getElementById('console-counter'); if(sCount) sCount.innerText = `NODE ${String(state.current + 1).padStart(2, '0')}/${lessonData.length}`;
+            const content = document.getElementById('mission-content'); if(content) content.innerHTML = `<div class="w-full max-w-7xl mx-auto">${step.html}</div>`;
+            updateHUD();
+            
+            // Highlight nav
+            const navList = document.getElementById('nav-steps-list');
+            if (navList) {
+                Array.from(navList.children).forEach((btn, i) => {
+                    if(i === state.current) { btn.className = 'w-full text-left p-4 rounded-xl flex items-center gap-4 transition-all font-ui text-sm cursor-pointer mb-2 border bg-[rgba(34,211,238,0.08)] text-[var(--accent-primary)] border-[var(--accent-primary)] font-semibold shadow-[0_0_15px_rgba(34,211,238,0.1)]'; } 
+                    else { btn.className = 'w-full text-left p-4 rounded-xl flex items-center gap-4 transition-all font-ui text-sm cursor-pointer mb-2 border bg-black/30 text-[var(--text-muted)] border-transparent hover:bg-white/5'; }
+                });
+            }
+
+            // Scroll to top
+            document.getElementById('mission-arena').scrollTo(0,0);
+        }
+
+        function nextStep() { if (state.current < lessonData.length - 1) { state.current++; renderStep(); } else { goHome(); } }
+        function prevStep() { if (state.current > 0) { state.current--; renderStep(); } }
+        
+        function toggleLessonNavigator() { document.getElementById('lesson-navigator').classList.toggle('active'); document.getElementById('teacher-hud')?.classList.remove('active'); document.getElementById('whiteboard')?.classList.remove('active');}
+        function toggleTeacherHUD() { document.getElementById('teacher-hud').classList.toggle('active'); document.getElementById('lesson-navigator')?.classList.remove('active'); document.getElementById('whiteboard')?.classList.remove('active');}
+        function toggleWhiteboard() { document.getElementById('whiteboard').classList.toggle('active'); document.getElementById('lesson-navigator')?.classList.remove('active'); document.getElementById('teacher-hud')?.classList.remove('active');}
+        function toggleFullscreen() { if (!document.fullscreenElement) { document.documentElement.requestFullscreen().catch(err => console.log(err)); } else { if (document.exitFullscreen) document.exitFullscreen(); } }
+        function toggleStarter(btn) { const content = btn.nextElementSibling; if (content.classList.contains('open')) { content.classList.remove('open'); } else { content.classList.add('open'); } }
+
+        // --- MINIGAMES LOGIC ---
+
+        // Dilemma Logic
+        function selectDilemma(card, id) {
+            const group = document.getElementById(`dilemma-group-${id}`);
+            if(group.classList.contains('locked')) return;
+
+            card.classList.add('selected');
+            group.classList.add('locked');
+            document.getElementById(`hub-dilemma-${id}`).classList.remove('hidden');
+            state.xp += 5; updateHUD(); 
+        }
+
+        // Debate Logic
+        function selectDebate(btn, id) {
+            const group = document.getElementById(`debate-group-${id}`);
+            if(group.classList.contains('locked')) return;
+
+            btn.classList.add('selected');
+            group.classList.add('locked');
+            document.getElementById(`hub-debate-${id}`).classList.remove('hidden');
+            state.xp += 5; updateHUD(); 
+        }
+
+        // Drag & Drop Vocab
+        function dragVocab(e, el) { e.dataTransfer.setData('text', el.dataset.word); el.classList.add('dragging'); }
+        function allowDropVocab(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+        function leaveDropVocab(e) { e.currentTarget.classList.remove('drag-over'); }
+        function dropVocab(e, zone) { 
+            e.preventDefault(); zone.classList.remove('drag-over'); 
+            const word = e.dataTransfer.getData('text'); 
+            if(word) checkVocabMatch(word, zone); 
+        }
+        function checkVocabMatch(wordStr, zone) {
+            const expected = zone.dataset.expected;
+            if(zone.querySelector('.matched-word')) return;
+
+            if(wordStr === expected) {
+                const wordEl = document.querySelector(`.drag-word[data-word="${wordStr}"]`);
+                if(!wordEl) return;
+                
+                const dropArea = zone.querySelector('.drop-area'); dropArea.innerHTML = ''; 
+                wordEl.classList.remove('drag-word');
+                wordEl.classList.add('matched-word', 'bg-[var(--accent-primary)]', 'text-[#000]', 'w-full', 'h-full', 'm-0', 'shadow-[0_0_20px_rgba(34,211,238,0.4)]', 'flex', 'items-center', 'justify-center', 'font-bold', 'font-heading', 'text-[1.1rem]', 'rounded-lg', 'border-none');
+                wordEl.draggable = false;
+                
+                dropArea.appendChild(wordEl); dropArea.classList.replace('bg-[rgba(0,0,0,0.3)]', 'bg-transparent'); dropArea.style.border = "none";
+                zone.classList.replace('border-dashed', 'border-solid');
+                zone.classList.replace('border-[var(--text-muted)]', 'border-[var(--accent-primary)]');
+                
+                state.xp += 6; updateHUD(); 
+                
+                const containerId = zone.closest('[id^="vocab-container-"]').id;
+                const container = document.getElementById(containerId);
+                const bank = container.querySelector('.vocab-bank');
+                if(bank.children.length === 0 || container.querySelectorAll('.matched-word').length === container.querySelectorAll('.drop-zone').length) {
+                    const followup = container.querySelector('.vocab-followup');
+                    followup.classList.remove('hidden'); followup.classList.add('animate-in', 'fade-in');
+                }
+            } else {
+                zone.classList.add('shake'); zone.style.borderColor = "var(--accent-alert)"; state.hp -= 10; updateHUD();
+                setTimeout(() => { zone.classList.remove('shake'); zone.style.borderColor = "rgba(255,255,255,0.1)"; }, 400);
+            }
+        }
+
+        // Tuner
+        function toggleTuner(id, textAff, textAlt, feedback, tagColor) {
+            const btn = document.getElementById(`tuner-track-${id}`);
+            const textEl = document.getElementById(`tuner-text-${id}`);
+            const aff = document.getElementById(`mode-aff-${id}`); const alt = document.getElementById(`mode-alt-${id}`);
+            
+            btn.classList.toggle('active');
+            textEl.style.opacity = 0;
+            
+            setTimeout(() => {
+                if(btn.classList.contains('active')) {
+                    aff.classList.replace('text-[var(--text-muted)]', 'text-[var(--border-soft)]'); aff.classList.replace('opacity-60', 'opacity-30');
+                    alt.classList.replace('text-[var(--text-main)]', 'text-[var(--accent-primary)]');
+                    textEl.innerHTML = textAlt.replace(/\[(.*?)\]/g, `<span style="color: ${tagColor}" class="border-b-2 border-[var(--accent-primary)] pb-1">$1</span>`); 
+                    textEl.classList.replace('text-[var(--accent-alert)]', 'text-white');
+                    document.getElementById(`tuner-fb-${id}`).classList.remove('hidden');
+                } else {
+                    aff.classList.replace('text-[var(--border-soft)]', 'text-[var(--text-muted)]'); aff.classList.replace('opacity-30', 'opacity-60');
+                    alt.classList.replace('text-[var(--accent-primary)]', 'text-[var(--text-main)]');
+                    textEl.innerHTML = textAff.replace(/\[(.*?)\]/g, `<span class="border-b-2 border-[var(--accent-alert)]/50 pb-1">$1</span>`); 
+                    textEl.classList.replace('text-white', 'text-[var(--accent-alert)]');
+                    document.getElementById(`tuner-fb-${id}`).classList.add('hidden');
+                }
+                textEl.style.opacity = 1;
+            }, 250);
+        }
+
+        // Logic Gate (Match)
+        let activeMatch = null; let matchesMatched = 0;
+        function handleMatch(node) {
+            if (node.classList.contains('matched')) return;
+            if (!activeMatch) { activeMatch = node; node.classList.add('active'); } 
+            else {
+                if (activeMatch.dataset.type !== node.dataset.type && activeMatch.dataset.id === node.dataset.id) {
+                    activeMatch.classList.replace('active', 'matched'); node.classList.add('matched');
+                    activeMatch = null; matchesMatched++; state.xp += 5; updateHUD();
+                    if(matchesMatched === document.getElementById('match-board').children[0].children[0].children.length) { document.getElementById('match-hub').classList.remove('hidden'); matchesMatched = 0; }
+                } else {
+                    activeMatch.classList.remove('active'); activeMatch.classList.add('shake'); activeMatch.style.borderColor = "var(--accent-alert)"; activeMatch.style.color = "var(--accent-alert)";
+                    node.classList.add('shake'); node.style.borderColor = "var(--accent-alert)"; node.style.color = "var(--accent-alert)";
+                    state.hp -= 10; updateHUD();
+                    setTimeout(() => { 
+                        activeMatch.classList.remove('shake'); activeMatch.style.borderColor = "var(--border-soft)"; activeMatch.style.color = "var(--text-main)"; 
+                        node.classList.remove('shake'); node.style.borderColor = "var(--border-soft)"; node.style.color = "var(--text-main)"; 
+                        activeMatch = null; 
+                    }, 400);
+                }
+            }
+        }
+
+        // Fixer (Redacted)
+        let activeBug = null; let expectedFix = "";
+        function triggerFixer(el, answer) {
+            if(el.classList.contains('faded-fixed')) return;
+            activeBug = el; expectedFix = answer;
+            const panel = document.getElementById('fix-panel'); panel.classList.remove('translate-y-full');
+            document.getElementById('fix-input').value = ''; document.getElementById('fix-input').focus();
+        }
+        function submitFixer() {
+            const input = document.getElementById('fix-input').value.trim().toLowerCase();
+            const panel = document.getElementById('fix-panel');
+            if(input === expectedFix.toLowerCase()) {
+                activeBug.innerText = expectedFix; activeBug.classList.remove('faded-word'); activeBug.classList.add('faded-fixed');
+                panel.classList.add('translate-y-full');
+                if(activeBug.closest('.min-h-\\[250px\\]').querySelectorAll('.faded-word').length === 0) { state.xp += 5; updateHUD(); document.getElementById('fixer-hub').classList.remove('hidden');}
+            } else {
+                const inputEl = document.getElementById('fix-input'); inputEl.classList.add('shake'); inputEl.style.borderColor = "var(--accent-alert)";
+                state.hp -= 10; updateHUD(); setTimeout(() => { inputEl.classList.remove('shake'); inputEl.style.borderColor = "var(--border-soft)"; }, 400);
+            }
+        }
+        document.getElementById('fix-input')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') submitFixer(); });
+
+        // GPT Simulator
+        let gptPrompted = false;
+        function promptAI(id) {
+            if (gptPrompted) return;
+            gptPrompted = true;
+            const btn = document.getElementById(`prompt-btn-${id}`);
+            btn.style.display = 'none';
+
+            const chat = document.getElementById(`ai-chat-box-${id}`);
+            chat.innerHTML += `<div class="chat-msg user">Generalists integrate better!</div>`;
+            chat.scrollTop = chat.scrollHeight;
+
+            setTimeout(() => {
+                const msgId = 'ai-msg-' + Date.now();
+                chat.innerHTML += `<div class="chat-msg ai" id="${msgId}"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
+                chat.scrollTop = chat.scrollHeight;
+                
+                setTimeout(() => {
+                    document.getElementById(msgId).innerHTML = `Insufficient data. Specialization is efficient. I cannot comprehend the value of 'dabbling'.`;
+                    chat.scrollTop = chat.scrollHeight;
+                    setTimeout(() => {
+                        document.getElementById(`ai-followup-${id}`).classList.remove('hidden');
+                        state.xp += 5; updateHUD(); 
+                    }, 2000);
+                }, 1800);
+            }, 600);
+        }
+
+        function triggerPraise(main, sub) {
+            document.getElementById('teacher-hud')?.classList.remove('active'); 
+            const overlay = document.getElementById('praise-overlay'); const card = document.getElementById('praise-card');
+            
+            document.getElementById('praise-main').innerText = main; document.getElementById('praise-sub').innerText = sub;
+            if(main === 'BRILLIANT DEDUCTION') {
+                document.getElementById('praise-icon').className = "fas fa-check-double text-6xl text-[var(--accent-primary)]";
+                document.getElementById('praise-main').className = "font-heading text-4xl md:text-5xl font-black tracking-tight uppercase mb-4 text-[var(--accent-primary)]";
+                card.style.boxShadow = "0 20px 60px rgba(0,0,0,0.8)";
+                card.style.borderColor = "var(--border-soft)";
+                card.style.borderTopColor = "var(--accent-primary)";
+                card.querySelector('.rounded-full').style.borderColor = "var(--accent-primary)";
+                card.querySelector('.rounded-full').style.boxShadow = "0 0 40px rgba(34,211,238,0.3)";
+            } else {
+                document.getElementById('praise-icon').className = "fas fa-bolt text-6xl text-[var(--accent-secondary)]";
+                document.getElementById('praise-main').className = "font-heading text-4xl md:text-5xl font-black tracking-tight uppercase mb-4 text-[var(--accent-secondary)]";
+                card.style.boxShadow = "0 20px 60px rgba(0,0,0,0.8)";
+                card.style.borderColor = "var(--border-soft)";
+                card.style.borderTopColor = "var(--accent-secondary)";
+                card.querySelector('.rounded-full').style.borderColor = "var(--accent-secondary)";
+                card.querySelector('.rounded-full').style.boxShadow = "0 0 40px rgba(129,140,248,0.3)";
+            }
+
+            overlay.classList.remove('opacity-0', 'pointer-events-none');
+            setTimeout(() => card.classList.replace('scale-50', 'scale-100'), 50); 
+            setTimeout(() => { card.classList.replace('scale-100', 'scale-50'); overlay.classList.add('opacity-0', 'pointer-events-none'); }, 2500);
+        }
+        
+        window.onload = () => { updateHUD(); buildLessonNavigator(); goHome(); };
+    </script>
+</body>
+</html>
